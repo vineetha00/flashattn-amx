@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flashattn-amx"
+version = "0.1.0"
+description = "FlashAttention forward pass for Apple Silicon CPUs - no CUDA, runs on the AMX matrix coprocessor via Accelerate"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24"]
+keywords = ["flash-attention", "attention", "apple-silicon", "amx", "accelerate", "transformer", "cpu"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: MacOS",
+    "Programming Language :: C",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+[project.optional-dependencies]
+torch = ["torch>=2.4"]
+
+[project.urls]
+Homepage = "https://github.com/vineetha00/flashattn-amx"
+Repository = "https://github.com/vineetha00/flashattn-amx"
+
+[tool.setuptools.packages.find]
+where = ["src"]
