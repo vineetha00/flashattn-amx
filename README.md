@@ -104,6 +104,26 @@ kernel via `use_flash_attention()`:
 
 Max logit difference vs PyTorch: 4e-6.
 
+### How far is a real GPU?
+
+For context, the same shapes were run on an NVIDIA GPU (Google Colab free
+tier, Tesla T4, fp16 — the GPU's native precision; the T4 is pre-Ampere, so
+PyTorch fell back to its memory-efficient kernel there, as real FlashAttention
+needs compute capability ≥ 8.0):
+
+| S | causal | T4 GPU (ms) | M3 this kernel (ms) | GPU advantage |
+|---:|:--:|---:|---:|---:|
+| 1024 | no | 0.32 | 5.00 | 15.7× |
+| 4096 | no | 3.43 | 80.66 | 23.5× |
+| 8192 | no | 10.56 | 336.40 | 31.9× |
+| 8192 | yes | 5.55 | 203.93 | 36.7× |
+
+That is the expected hardware gap, not an algorithmic one — this kernel's claim
+is fastest attention *without* CUDA, not faster than a GPU. Reproduce with
+`bench/colab_gpu_vs_m3.ipynb` (Colab) or `bench/gpu_bench.py` (any CUDA
+machine; on Ampere+ it uses the genuine flash backend and also benchmarks the
+official `flash-attn` package when installed).
+
 ### Accuracy and memory
 
 Max |error| vs a float64 exact-softmax reference is ~1e-6, the same as
@@ -129,7 +149,7 @@ attention at S=8192, H=8 materializes a 2 GB score matrix.
 - `src/flashattn_amx/torch_ops.py` — PyTorch custom op, SDPA drop-in,
   whole-model patch
 - `tests/` — correctness vs an exact float64 reference
-- `bench/` — kernel and end-to-end benchmarks
+- `bench/` — kernel, end-to-end, and GPU comparison benchmarks
 
 ## License
 

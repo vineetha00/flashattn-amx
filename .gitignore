@@ -16,5 +16,3 @@ __pycache__/
 /e2e_bench.py
 /bench_results.json
 
-# other sessions' working files
-/colab_gpu_vs_m3.ipynb
