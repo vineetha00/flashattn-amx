@@ -1,0 +1,20 @@
+Measured 2026-11-19 via `modal run bench/modal_bench.py` (Modal A100).
+
+NVIDIA A100-SXM4-40GB | torch backend: FlashAttention (CUDA)
+     S causal | GPU sdpa ms  M3 ours ms M3 torch ms | GPU vs M3-ours
+--------------------------------------------------------------------
+   256      0 |       0.023        0.51        0.79 |          22.6x
+   512      0 |       0.030        1.62        2.29 |          54.4x
+  1024      0 |       0.050        5.00        8.87 |          99.9x
+  2048      0 |       0.110       20.47       26.36 |         186.0x
+  4096      0 |       0.317       80.66      111.14 |         254.4x
+  8192      0 |       1.014      336.40      435.60 |         331.6x
+   256      1 |       0.022        0.50        0.87 |          22.7x
+   512      1 |       0.030        1.33        2.97 |          44.5x
+  1024      1 |       0.043        3.64        7.90 |          85.5x
+  2048      1 |       0.097       12.98       21.67 |         133.7x
+  4096      1 |       0.223       52.16       73.32 |         234.0x
+  8192      1 |       0.689      203.93      244.30 |         296.2x
+
+Last column: how many times faster this GPU's best flash kernel is than
+the M3 CPU kernel (fp16 GPU vs fp32 CPU — each side's native precision).

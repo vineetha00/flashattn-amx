@@ -106,23 +106,25 @@ Max logit difference vs PyTorch: 4e-6.
 
 ### How far is a real GPU?
 
-For context, the same shapes were run on an NVIDIA GPU (Google Colab free
-tier, Tesla T4, fp16 — the GPU's native precision; the T4 is pre-Ampere, so
-PyTorch fell back to its memory-efficient kernel there, as real FlashAttention
-needs compute capability ≥ 8.0):
+For context, the same shapes were run against real CUDA FlashAttention on an
+NVIDIA A100-SXM4-40GB (Ampere, so PyTorch's genuine `FLASH_ATTENTION` backend;
+via [Modal](https://modal.com)) and on a Colab free-tier Tesla T4 (pre-Ampere,
+so PyTorch fell back to its memory-efficient kernel there). GPUs run fp16,
+their native precision; the M3 runs fp32, its native precision:
 
-| S | causal | T4 GPU (ms) | M3 this kernel (ms) | GPU advantage |
-|---:|:--:|---:|---:|---:|
-| 1024 | no | 0.32 | 5.00 | 15.7× |
-| 4096 | no | 3.43 | 80.66 | 23.5× |
-| 8192 | no | 10.56 | 336.40 | 31.9× |
-| 8192 | yes | 5.55 | 203.93 | 36.7× |
+| S | causal | A100 flash (ms) | T4 (ms) | M3 this kernel (ms) | A100 advantage |
+|---:|:--:|---:|---:|---:|---:|
+| 256 | no | 0.023 | — | 0.51 | 22.6× |
+| 1024 | no | 0.050 | 0.32 | 5.00 | 99.9× |
+| 4096 | no | 0.317 | 3.43 | 80.66 | 254.4× |
+| 8192 | no | 1.014 | 10.56 | 336.40 | 331.6× |
+| 8192 | yes | 0.689 | 5.55 | 203.93 | 296.2× |
 
 That is the expected hardware gap, not an algorithmic one — this kernel's claim
 is fastest attention *without* CUDA, not faster than a GPU. Reproduce with
-`bench/colab_gpu_vs_m3.ipynb` (Colab) or `bench/gpu_bench.py` (any CUDA
-machine; on Ampere+ it uses the genuine flash backend and also benchmarks the
-official `flash-attn` package when installed).
+`modal run bench/modal_bench.py` (one command, runs `bench/gpu_bench.py` on an
+A100), `bench/gpu_bench.py` directly on any CUDA machine, or
+`bench/colab_gpu_vs_m3.ipynb` on Colab.
 
 ### Accuracy and memory
 
