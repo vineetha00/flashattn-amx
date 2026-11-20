@@ -1,8 +1,16 @@
 # flashattn-amx
 
+[![PyPI](https://img.shields.io/pypi/v/flashattn-amx)](https://pypi.org/project/flashattn-amx/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 FlashAttention without CUDA: a FlashAttention forward pass for Apple Silicon
 CPUs that **beats PyTorch's flash-attention CPU kernel by 1.2–2.2×** in every
 benchmarked configuration.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/speedup_dark.png">
+  <img alt="Speedup over PyTorch's flash-attention CPU kernel on an Apple M3: 1.29–1.77x non-causal and 1.20–2.24x causal across sequence lengths 256 to 8192" src="docs/speedup.png">
+</picture>
 
 It implements the same algorithm as FlashAttention (Dao et al. 2022) — tiled
 attention with an online softmax, O(S) extra memory instead of the O(S²) score
