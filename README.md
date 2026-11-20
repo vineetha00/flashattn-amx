@@ -121,10 +121,30 @@ their native precision; the M3 runs fp32, its native precision:
 | 8192 | yes | 0.689 | 5.55 | 203.93 | 296.2× |
 
 That is the expected hardware gap, not an algorithmic one — this kernel's claim
-is fastest attention *without* CUDA, not faster than a GPU. Reproduce with
+is fastest *CPU* attention, not faster than a GPU. Reproduce with
 `modal run bench/modal_bench.py` (one command, runs `bench/gpu_bench.py` on an
 A100), `bench/gpu_bench.py` directly on any CUDA machine, or
 `bench/colab_gpu_vs_m3.ipynb` on Colab.
+
+### And the M3's own GPU (MPS)?
+
+The same chip also has an integrated GPU, so an honest claim needs this table
+too — PyTorch's MPS backend, same shapes:
+
+| S | causal | MPS fp32 (ms) | MPS fp16 (ms) | this kernel, CPU (ms) | MPS fp32 advantage |
+|---:|:--:|---:|---:|---:|---:|
+| 256 | no | 0.39 | 0.12 | 0.51 | 1.3× |
+| 1024 | no | 1.75 | 1.66 | 5.00 | 2.9× |
+| 8192 | no | 205.16 | 149.45 | 336.40 | 1.6× |
+| 256 | yes | 0.12 | 0.14 | 0.50 | 4.4× |
+| 1024 | yes | 0.73 | 0.64 | 3.64 | 5.0× |
+| 8192 | yes | 108.97 | 82.24 | 203.93 | 1.9× |
+
+So: if your whole model lives on MPS, keep it there. This kernel is for
+CPU-resident pipelines — the MPS timings above exclude CPU↔GPU transfer of
+inputs and outputs, which dominates when attention is a single op inside CPU
+code, and the kernel also leaves the GPU free and works from plain NumPy.
+Reproduce with `python bench/mps_bench.py`.
 
 ### Accuracy and memory
 
